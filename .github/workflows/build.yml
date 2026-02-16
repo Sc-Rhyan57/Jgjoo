@@ -26,23 +26,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Create Gradle Wrapper
-      run: |
-        mkdir -p gradle/wrapper
-        cat > gradle/wrapper/gradle-wrapper.properties << 'PROPS'
-        distributionBase=GRADLE_USER_HOME
-        distributionPath=wrapper/dists
-        distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
-        networkTimeout=10000
-        validateDistributionUrl=true
-        zipStoreBase=GRADLE_USER_HOME
-        zipStorePath=wrapper/dists
-        PROPS
-        curl -fsSL https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew -o gradlew
-        chmod +x gradlew
+    - name: Setup Gradle 8.4
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.4'
 
     - name: Build ${{ inputs.buildType }} APK
-      run: ./gradlew assemble${{ inputs.buildType == 'release' && 'Release' || 'Debug' }}
+      run: gradle assemble${{ inputs.buildType == 'release' && 'Release' || 'Debug' }}
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
