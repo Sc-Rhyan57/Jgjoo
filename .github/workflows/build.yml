@@ -15,11 +15,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      
+
     - name: Setup JDK 17
       uses: actions/setup-java@v4
       with:
@@ -31,24 +31,24 @@ jobs:
 
     - name: Generate Gradle Wrapper
       run: gradle wrapper --gradle-version 8.4
-      
+
     - name: Grant execute permission
       run: chmod +x gradlew
-      
+
     - name: Build ${{ inputs.buildType }} APK
       run: ./gradlew assemble${{ inputs.buildType == 'release' && 'Release' || 'Debug' }}
-      
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: apk-extract-${{ inputs.buildType }}
         path: app/build/outputs/apk/${{ inputs.buildType }}/*.apk
-        
+
     - name: Get APK path
       id: apk
       run: |
         echo "path=$(find app/build/outputs/apk/${{ inputs.buildType }} -name '*.apk')" >> $GITHUB_OUTPUT
-        
+
     - name: Create Release
       if: inputs.buildType == 'release'
       uses: softprops/action-gh-release@v1
