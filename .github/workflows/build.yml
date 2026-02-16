@@ -1,0 +1,56 @@
+name: Build APK Extract
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildType:
+        description: 'Build Type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission
+      run: chmod +x gradlew
+      
+    - name: Build ${{ inputs.buildType }} APK
+      run: ./gradlew assemble${{ inputs.buildType == 'release' && 'Release' || 'Debug' }}
+      
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk-extract-${{ inputs.buildType }}
+        path: app/build/outputs/apk/${{ inputs.buildType }}/*.apk
+        
+    - name: Get APK path
+      id: apk
+      run: |
+        echo "path=$(find app/build/outputs/apk/${{ inputs.buildType }} -name '*.apk')" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      if: inputs.buildType == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: APK Extract v1.0.${{ github.run_number }}
+        files: ${{ steps.apk.outputs.path }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
