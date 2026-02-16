@@ -21,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -215,11 +214,10 @@ class MainActivity : ComponentActivity() {
                     AnimatedVisibility(isAnalyzing) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             LinearProgressIndicator(
-                                progress = { progress },
+                                progress = progress,
                                 modifier = Modifier.fillMaxWidth(),
                                 color = Color(0xFF00E5FF),
-                                trackColor = Color(0xFF1E2530),
-                                strokeCap = StrokeCap.Round
+                                trackColor = Color(0xFF1E2530)
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(statusMsg, fontSize = 12.sp, color = Color(0xFF546E7A))
@@ -578,7 +576,7 @@ class MainActivity : ComponentActivity() {
                 }
                 Spacer(Modifier.height(12.dp))
                 LinearProgressIndicator(
-                    progress = { ratio },
+                    progress = ratio,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp)
